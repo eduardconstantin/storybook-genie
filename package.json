@@ -2,7 +2,7 @@
   "name": "storybook-genie",
   "version": "1.0.0",
   "description": "Storybook Genie is a command line interface tool that can generate Storybook stories from React components.",
-  "license": "ISC",
+  "license": "MIT",
   "author": "@eduardconstantin",
   "type": "module",
   "main": "index.js",
