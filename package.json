@@ -1,5 +1,5 @@
 {
-  "name": "@eduardconstantin/storybook-genie",
+  "name": "storybook-genie",
   "version": "1.0.0",
   "description": "Storybook Genie is a command line interface tool that can generate Storybook stories from React components.",
   "keywords": [
@@ -15,15 +15,21 @@
   "author": "@eduardconstantin",
   "type": "module",
   "main": "index.js",
+  "bugs": {
+    "url": "https://github.com/eduardconstantin/storybook-genie/issues"
+  },
+  "homepage": "https://github.com/eduardconstantin/storybook-genie#readme",
   "bin": {
     "storybook-genie": "./index.js"
   },
+  "scripts": {
+    "start": "node .",
+    "up": "npm version patch -f",
+    "pub": "npm up && npm publish"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/eduardconstantin/storybook-genie.git"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "url": "https://github.com/eduardconstantin/storybook-genie"
   },
   "dependencies": {
     "inquirer": "^9.2.2",
