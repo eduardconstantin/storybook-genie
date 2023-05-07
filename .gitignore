@@ -3,3 +3,6 @@
 
 # local env files
 .env*
+
+# npm config file
+.npmrc
