@@ -1,8 +1,8 @@
 # dependencies
 /node_modules
 
-# local env files
-.env*
-
 # npm config file
 .npmrc
+
+# local env files
+.env*
