@@ -1,9 +1,8 @@
 import { Configuration, OpenAIApi } from "openai";
 
 export async function ComponentConverter(component, apiKey) {
-  "use server";
-  const template = `import type { Meta, StoryObj } from '@storybook/react';\n//import component\nconst meta: Meta<//type of component> = {\n title: //title of component,\n component: //component\n};\nexport default meta;\ntype Story = StoryObj<//type of component>;\nconst StoryTemplate: Story = {\n render: (args) => //render component\n};\nexport Primary = {\n ...StoryTemplate,\n args: {\n //component's props\n}\n}`;
-  const prompt = `Write a Storybook component from a React component, without any comments added. Here's the input code for the react component:\n${component}\nThis is the template I want you to use to create the storybook component, keep the provided format, add component variants if possible:\n${template}\n`;
+  const template = `import type { Meta, StoryObj } from '@storybook/react';\n//import component\nconst meta: Meta<//type of component> = {\n title: //title of component,\n component: //component\n};\nexport default meta;\ntype Story = StoryObj<//type of component>;\nconst StoryTemplate: Story = {\n render: (args) => //render component\n};\nexport Primary = {\n ...StoryTemplate,\n args: {\n //add component's props\n}\n}\n`;
+  const prompt = `Write a Storybook component from a React component, without any comments added. Here's the input code for the react component:\n{${component}}\nThis is the template I want you to use to create the storybook component, keep the provided format, add component variants if possible:\n{${template}}\n`;
 
   const configuration = new Configuration({
     apiKey: apiKey,
