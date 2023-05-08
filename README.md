@@ -5,7 +5,7 @@ Storybook Genie is a command line interface tool that can be used to convert fil
 Storybook stories.
 
 <br /> 
-<img src="app-preview.gif"/>
+<img src="cli-preview.gif"/>
 
 <div align="center">
 <br />
