@@ -28,7 +28,7 @@
   "scripts": {
     "start": "node .",
     "up": "npm version patch -f",
-    "pub": "npm run up && npm publish --registry https://registry.npmjs.org"
+    "pub": "npm run up && npm publish --registry=https://registry.npmjs.org"
   },
   "repository": {
     "type": "git",
