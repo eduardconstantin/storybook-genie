@@ -47,6 +47,14 @@ For Windows systems:
 set OPENAI_API_KEY=$YOUR_API_KEY
 ```
 
+## ✨ Usage
+
+To use Storybook Genie, run the following command:
+
+```bash
+npx storybook-genie
+```
+
 ## 🌱 Getting Started
 
 Clone the repository:
