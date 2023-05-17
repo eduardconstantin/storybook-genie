@@ -34,6 +34,7 @@
   "dependencies": {
     "inquirer": "^9.2.2",
     "inquirer-file-path": "^1.0.1",
+    "js-beautify": "^1.14.7",
     "openai": "^3.2.1",
     "ora": "^6.3.0",
     "path": "^0.12.7",
