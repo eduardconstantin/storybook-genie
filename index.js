@@ -7,6 +7,21 @@ import ora from "ora";
 import dotenv from "universal-dotenv";
 import { ComponentConverter } from "./converter.js";
 import path from "path";
+import beautify from "js-beautify";
+
+const options = {
+  indent_size: 2,
+  jslint_happy: true,
+  end_with_newline: false,
+  e4x: true,
+};
+
+const resetOptions = {
+  e4x: true,
+  preserve_newlines: false,
+  indent_level: 0,
+  indent_size: 0,
+};
 
 dotenv.init();
 
@@ -32,7 +47,12 @@ async function run() {
       const input = readFileSync(inputPath, "utf-8");
       const extension = path.extname(inputPath);
       const spinner = ora("Generating story...").start();
-      const story = await ComponentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), process.env.OPENAI_API_KEY);
+      const story = await ComponentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), process.env.OPENAI_API_KEY)
+        .then((story) => {
+          // reset indentation first
+          story = beautify(story, resetOptions)
+          return beautify(story, options)
+        });
       writeFileSync(inputPath.replace(extension, `.story${extension}`), story);
       spinner.stop();
     });
