@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
-import { existsSync, readFileSync, writeFileSync } from "fs";
-import inquirer from "inquirer";
-import inquirerPath from "inquirer-file-path";
+import { readFileSync, writeFileSync } from "fs";
 import ora from "ora";
 import dotenv from "universal-dotenv";
-import { ComponentConverter } from "./converter.js";
+import { componentConverter } from "./src/converter.js";
+import { fileSelector } from "./src/selector.js";
 import path from "path";
 import beautify from "js-beautify";
 
@@ -26,36 +25,24 @@ const resetOptions = {
 dotenv.init();
 
 async function run() {
-  inquirer.registerPrompt("file", inquirerPath);
-  inquirer
-    .prompt([
-      {
-        type: "file",
-        name: "inputPath",
-        message: "Enter the path to the input file or directory:",
-        basePath: "./",
-        validate: function (input) {
-          if (!existsSync(input)) {
-            return "Invalid path. Please enter a valid path.";
-          }
-          return true;
-        },
-      },
-    ])
-    .then(async (answers) => {
-      const inputPath = answers.inputPath;
-      const input = readFileSync(inputPath, "utf-8");
-      const extension = path.extname(inputPath);
-      const spinner = ora("Generating story...").start();
-      const story = await ComponentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), process.env.OPENAI_API_KEY)
-        .then((story) => {
-          // reset indentation first
-          story = beautify(story, resetOptions)
-          return beautify(story, options)
-        });
-      writeFileSync(inputPath.replace(extension, `.story${extension}`), story);
-      spinner.stop();
-    });
+  await fileSelector({
+    message: "Enter the path to the input file or directory:",
+    basePath: "./",
+    pageSize: 10,
+  }).then(async (file) => {
+    if (!file) return;
+    const input = readFileSync(file, "utf-8");
+    const extension = path.extname(file);
+    const spinner = ora("Generating story...").start();
+    const story = await componentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), process.env.OPENAI_API_KEY).then(
+      (story) => {
+        story = beautify(story, resetOptions);
+        return beautify(story, options);
+      }
+    );
+    writeFileSync(file.replace(extension, `.story${extension}`), story);
+    spinner.stop();
+  });
 }
 
 await run();

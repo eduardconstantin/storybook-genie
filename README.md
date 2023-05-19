@@ -21,6 +21,7 @@ Storybook stories.
 ## 🌟 Features
 
 - File selection input
+- JS beautify
 
 ## 📦 Installation
 
