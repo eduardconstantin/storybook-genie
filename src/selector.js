@@ -2,7 +2,6 @@ import {
   createPrompt,
   useState,
   useRef,
-  usePrefix,
   useKeypress,
   isEnterKey,
   isNumberKey,
@@ -14,19 +13,16 @@ import {
 import fs from "fs";
 import path from "path";
 import chalk from "chalk";
-import figures from "figures";
-import ansiEscapes from "ansi-escapes";
 
-function isSelectableChoice(file) {
+const isSelectableChoice = (file) => {
   return file != null && file.type !== "separator" && !file.disabled;
-}
+};
 
 export const fileSelector = createPrompt((config, done) => {
-  const { basePath="./", message, pageSize = 10, extensions = ['.js', '.jsx', '.ts', '.tsx'] } = config;
+  const { basePath = "./", message, pageSize = 10, extensions = [".js", ".jsx", ".ts", ".tsx"] } = config;
 
   const paginator = useRef(new Paginator()).current;
   const firstRender = useRef(true);
-  const prefix = usePrefix();
 
   const [cursorPosition, setCursorPos] = useState(1);
   const [filePath, setFilePath] = useState(basePath);
@@ -37,7 +33,7 @@ export const fileSelector = createPrompt((config, done) => {
     const isDirectory = fs.lstatSync(fullPath).isDirectory();
 
     if (isDirectory || extensions.includes(path.extname(file))) {
-      const displayText = isDirectory ? `${chalk.blue("[DIR]")} ${file}` : file;
+      const displayText = isDirectory ? `${chalk.blueBright("[DIR]")} ${file}` : file;
       acc.push({
         name: displayText,
         value: isDirectory ? `${fullPath}/` : fullPath,
@@ -49,7 +45,7 @@ export const fileSelector = createPrompt((config, done) => {
   }, []);
 
   const goBackOption = { name: chalk.gray("[..] BACK"), value: "..", isDirectory: false };
-  const exitOption = { name: chalk.redBright("[X] EXIT"), value: null, isDirectory: false };
+  const exitOption = { name: chalk.redBright("ⓧ  EXIT"), value: null, isDirectory: false };
 
   const choices = [...files].sort((a, b) => {
     if (a.isDirectory && !b.isDirectory) {
@@ -109,10 +105,10 @@ export const fileSelector = createPrompt((config, done) => {
   });
 
   if (status === "done") {
-    return `${prefix} ${message} ${chalk.greenBright(choice.name || choice.value)}`;
+    return chalk.greenBright(`✔ Selected file: ${choice.name || choice.value}`);
   }
   if (status === "exit") {
-    return `${prefix} ${message} ${chalk.redBright("File selection canceled.")}`;
+    return `${chalk.redBright("✘ File selection canceled.")}`;
   }
 
   const allChoices = choices
@@ -128,7 +124,7 @@ export const fileSelector = createPrompt((config, done) => {
       }
 
       if (index === cursorPosition) {
-        return chalk.cyan(`${figures.pointer} ${line}`);
+        return chalk.cyan(`❯ ${line}`);
       }
 
       return `  ${line}`;
@@ -137,10 +133,10 @@ export const fileSelector = createPrompt((config, done) => {
 
   let output = chalk.bold(message);
   if (firstRender.current) {
-    output += chalk.dim(" (Use arrow keys)");
+    output += chalk.dim(" ↕ (Use arrow keys)");
     firstRender.current = false;
   }
 
   const windowedChoices = paginator.paginate(allChoices, cursorPosition, pageSize);
-  return `${prefix} ${output}\n${windowedChoices}${ansiEscapes.cursorHide}`;
+  return `${chalk.greenBright("┇")} ${output}\n${windowedChoices}\x1B[?25l`;
 });
