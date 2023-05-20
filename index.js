@@ -26,9 +26,7 @@ dotenv.init();
 
 async function run() {
   await fileSelector({
-    message: "Enter the path to the input file or directory:",
-    basePath: "./",
-    pageSize: 10,
+    message: "Select the file containing the react compontent:",
   }).then(async (file) => {
     if (!file) return;
     const input = readFileSync(file, "utf-8");
