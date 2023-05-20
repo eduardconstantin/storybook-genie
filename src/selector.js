@@ -22,7 +22,7 @@ function isSelectableChoice(file) {
 }
 
 export const fileSelector = createPrompt((config, done) => {
-  const { basePath, message } = config;
+  const { basePath="./", message, pageSize = 10, extensions = ['.js', '.jsx', '.ts', '.tsx'] } = config;
 
   const paginator = useRef(new Paginator()).current;
   const firstRender = useRef(true);
@@ -32,16 +32,21 @@ export const fileSelector = createPrompt((config, done) => {
   const [filePath, setFilePath] = useState(basePath);
   const [status, setStatus] = useState("pending");
 
-  let files = fs.readdirSync(filePath).map((file) => {
+  let files = fs.readdirSync(filePath).reduce((acc, file) => {
     const fullPath = path.join(filePath, file);
     const isDirectory = fs.lstatSync(fullPath).isDirectory();
-    const displayText = isDirectory ? `${chalk.blue("[DIR]")} ${file}` : file;
-    return {
-      name: displayText,
-      value: isDirectory ? `${fullPath}/` : fullPath,
-      isDirectory: isDirectory,
-    };
-  });
+
+    if (isDirectory || extensions.includes(path.extname(file))) {
+      const displayText = isDirectory ? `${chalk.blue("[DIR]")} ${file}` : file;
+      acc.push({
+        name: displayText,
+        value: isDirectory ? `${fullPath}/` : fullPath,
+        isDirectory: isDirectory,
+      });
+    }
+
+    return acc;
+  }, []);
 
   const goBackOption = { name: chalk.gray("[..] BACK"), value: "..", isDirectory: false };
   const exitOption = { name: chalk.redBright("[X] EXIT"), value: null, isDirectory: false };
@@ -104,7 +109,7 @@ export const fileSelector = createPrompt((config, done) => {
   });
 
   if (status === "done") {
-    return `${prefix} ${message} ${chalk.cyan(choice.name || choice.value)}`;
+    return `${prefix} ${message} ${chalk.greenBright(choice.name || choice.value)}`;
   }
   if (status === "exit") {
     return `${prefix} ${message} ${chalk.redBright("File selection canceled.")}`;
@@ -136,6 +141,6 @@ export const fileSelector = createPrompt((config, done) => {
     firstRender.current = false;
   }
 
-  const windowedChoices = paginator.paginate(allChoices, cursorPosition, config.pageSize);
+  const windowedChoices = paginator.paginate(allChoices, cursorPosition, pageSize);
   return `${prefix} ${output}\n${windowedChoices}${ansiEscapes.cursorHide}`;
 });
