@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import {
   createPrompt,
   useState,
@@ -10,9 +12,6 @@ import {
   Paginator,
   Separator,
 } from "@inquirer/core";
-import fs from "fs";
-import path from "path";
-import chalk from "chalk";
 
 const isSelectableChoice = (file) => {
   return file != null && file.type !== "separator" && !file.disabled;
@@ -28,45 +27,46 @@ export const fileSelector = createPrompt((config, done) => {
   const [filePath, setFilePath] = useState(basePath);
   const [status, setStatus] = useState("pending");
 
-  let files = fs.readdirSync(filePath).reduce((acc, file) => {
-    const fullPath = path.join(filePath, file);
-    const isDirectory = fs.lstatSync(fullPath).isDirectory();
+  let files = fs
+    .readdirSync(filePath)
+    .reduce((acc, file) => {
+      const fullPath = path.join(filePath, file);
+      const isDirectory = fs.lstatSync(fullPath).isDirectory();
 
-    if (isDirectory || extensions.includes(path.extname(file))) {
-      const displayText = isDirectory ? `${chalk.blueBright("[DIR]")} ${file}` : file;
-      acc.push({
-        name: displayText,
-        value: isDirectory ? `${fullPath}/` : fullPath,
-        isDirectory: isDirectory,
-      });
-    }
+      if (isDirectory || extensions.includes(path.extname(file))) {
+        const displayText = isDirectory ? `\x1b[94m\x1b[1m[DIR]\x1b[0m ${file}` : file;
+        acc.push({
+          name: displayText,
+          value: isDirectory ? `${fullPath}/` : fullPath,
+          isDirectory: isDirectory,
+        });
+      }
 
-    return acc;
-  }, []);
+      return acc;
+    }, [])
+    .sort((a, b) => {
+      if (a.isDirectory && !b.isDirectory) {
+        return -1;
+      }
+      if (!a.isDirectory && b.isDirectory) {
+        return 1;
+      }
+      return 0;
+    });
 
-  const goBackOption = { name: chalk.gray("[..] BACK"), value: "..", isDirectory: false };
-  const exitOption = { name: chalk.redBright("ⓧ  EXIT"), value: null, isDirectory: false };
+  const goBackOption = { name: `\x1b[90m[..]  BACK\x1b[0m`, value: "..", isDirectory: false };
+  const exitOption = { name: `\x1b[91mⓧ  EXIT\x1b[0m`, value: null, isDirectory: false };
 
-  const choices = [...files].sort((a, b) => {
-    if (a.isDirectory && !b.isDirectory) {
-      return -1;
-    }
-    if (!a.isDirectory && b.isDirectory) {
-      return 1;
-    }
-    return 0;
-  });
+  files.unshift(new Separator());
+  if (filePath !== "./") files.unshift(goBackOption);
+  files.push(new Separator());
+  files.push(exitOption);
 
-  choices.unshift(new Separator());
-  if (filePath !== "./") choices.unshift(goBackOption);
-  choices.push(new Separator());
-  choices.push(exitOption);
-
-  const choice = choices[cursorPosition];
+  const choice = files[cursorPosition];
 
   useKeypress((key) => {
     if (isEnterKey(key)) {
-      const selectedOption = choices[cursorPosition];
+      const selectedOption = files[cursorPosition];
 
       if (selectedOption.value === "..") {
         const parentDirectory = path.dirname(filePath);
@@ -88,15 +88,15 @@ export const fileSelector = createPrompt((config, done) => {
       let selectedOption;
 
       while (!isSelectableChoice(selectedOption)) {
-        newCursorPosition = (newCursorPosition + offset + choices.length) % choices.length;
-        selectedOption = choices[newCursorPosition];
+        newCursorPosition = (newCursorPosition + offset + files.length) % files.length;
+        selectedOption = files[newCursorPosition];
       }
 
       setCursorPos(newCursorPosition);
     } else if (isNumberKey(key)) {
       const newCursorPosition = Number(key.name) - 1;
 
-      if (!isSelectableChoice(choices[newCursorPosition])) {
+      if (!isSelectableChoice(files[newCursorPosition])) {
         return;
       }
 
@@ -105,13 +105,13 @@ export const fileSelector = createPrompt((config, done) => {
   });
 
   if (status === "done") {
-    return chalk.greenBright(`✔ Selected file: ${choice.name || choice.value}`);
+    return `\x1b[92m\x1b[1m✔ Selected file: ${choice.name || choice.value}\x1b[0m`;
   }
   if (status === "exit") {
-    return `${chalk.redBright("✘ File selection canceled.")}`;
+    return `\x1b[91m\x1b[1m✘ File selection canceled.\x1b[0m`;
   }
 
-  const allChoices = choices
+  const allFiles = files
     .map((choice, index) => {
       if (choice.type === "separator") {
         return ` ${choice.separator}`;
@@ -120,23 +120,25 @@ export const fileSelector = createPrompt((config, done) => {
       const line = choice.name || choice.value;
       if (choice.disabled) {
         const disabledLabel = typeof choice.disabled === "string" ? choice.disabled : "(disabled)";
-        return chalk.dim(`- ${line} ${disabledLabel}`);
+        return `\x1b[90m- ${line} ${disabledLabel}\x1b[0m`;
       }
 
       if (index === cursorPosition) {
-        return chalk.cyan(`❯ ${line}`);
+        return line.split(" ").length === 2
+          ? `\x1b[36m❯ ${line.split(" ")[0]}\x1b[0m \x1b[36m${line.split(" ")[1]}\x1b[0m`
+          : `\x1b[36m❯ ${line}\x1b[0m`;
       }
 
       return `  ${line}`;
     })
     .join("\n");
 
-  let output = chalk.bold(message);
+  let output = `\x1b[1m${message}\x1b[0m`;
   if (firstRender.current) {
-    output += chalk.dim(" ↕ (Use arrow keys)");
+    output += `\x1b[90m ↕ (Use arrow keys)\x1b[0m`;
     firstRender.current = false;
   }
 
-  const windowedChoices = paginator.paginate(allChoices, cursorPosition, pageSize);
-  return `${chalk.greenBright("┇")} ${output}\n${windowedChoices}\x1B[?25l`;
+  const windowedChoices = paginator.paginate(allFiles, cursorPosition, pageSize);
+  return `\x1b[92m┇\x1b[0m ${output}\n${windowedChoices}\x1B[?25l`;
 });
