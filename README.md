@@ -22,6 +22,7 @@ Storybook stories.
 
 - File selection input
 - JS beautify
+- A small number of dependencies
 
 ## 📦 Installation
 
