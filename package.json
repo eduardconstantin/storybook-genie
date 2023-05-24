@@ -9,6 +9,7 @@
     "react",
     "component",
     "story",
+    "command-line",
     "tool"
   ],
   "license": "MIT",
