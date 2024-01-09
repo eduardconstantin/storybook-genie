@@ -20,9 +20,11 @@ Storybook stories.
 
 ## 🌟 Features
 
+- Using GPT 3.5 turbo
 - File selection input
 - JS beautify
 - A small number of dependencies
+
 
 ## 📦 Installation
 
