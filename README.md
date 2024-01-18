@@ -20,11 +20,10 @@ Storybook stories.
 
 ## 🌟 Features
 
-- Using GPT 3.5 turbo
+- Select preferred model
 - File selection input
 - JS beautify
 - A small number of dependencies
-
 
 ## 📦 Installation
 
@@ -52,6 +51,15 @@ set OPENAI_API_KEY=$YOUR_API_KEY
 ```
 
 ## ✨ Usage
+
+A default model can be set in storybook-genie.config.json file, just create on in the root of the project and add the
+following code:
+
+```bash
+{
+  defaultModel: "gpt-4"
+}
+```
 
 To use Storybook Genie, run the following command:
 

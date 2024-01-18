@@ -1,23 +1,27 @@
-import OpenAI from "openai";
+import getClient from "./client.js";
 
-export async function componentConverter(component, apiKey) {
-  const template = `import type { Meta, StoryObj } from '@storybook/react';\n//import component\nconst meta: Meta<//type of component> = {\n title: //title of component,\n component: //component\n};\nexport default meta;\ntype Story = StoryObj<//type of component>;\nconst StoryTemplate: Story = {\n render: (args) => //render component\n};\nexport Primary = {\n ...StoryTemplate,\n args: {\n //add component's props\n}\n}\n`;
-  const prompt = `Write a Storybook component from a React component, without any comments added. Here's the input code for the react component:\n{${component}}\nThis is the template I want you to use to create the storybook component, keep the provided format, add component variants if possible:\n{${template}}\n`;
+export async function componentConverter(component, model) {
+  const template = `import type { Meta, StoryObj } from '@storybook/react';\n/* import component file */\nconst meta = {\n  title: /* Component title */,\n  component: /* Component name */,\n  parameters: {\n    layout: 'centered'\n  },\n  tags: ['autodocs'],\n} satisfies Meta<typeof /* Component name */>\n\nexport default meta\n\ntype Story = StoryObj<typeof meta>\n\nexport const /* StoryName */ : Story = {\n  args: {\n    /* args */\n  },\n}`;
+  const prompt = `You are a senior web developer. You are specialized in creating Storybook stories for React components. Your focus is on aiding expert frontend developers by generating clean, readable, and standardized story code. You strictly adhere to CSF3 conventions and do not use Component Story Format 2 (CSF2).\nThe user will give you the react component and you will reply with the code and nothing else, avoiding comments.\nBelow, here's the template you will stick to. Keep the provided format and add component variants if possible:\n${template}`;
 
-  const openai = new OpenAI({
-    apiKey: apiKey,
-  });
-  
-  const response = await openai.completions.create({
-    model: "gpt-3.5-turbo-instruct",
-    prompt,
+  const response = await getClient().chat.completions.create({
+    model,
+    messages: [
+      {
+        role: "system",
+        content: prompt,
+      },
+      {
+        role: "user",
+        content: component,
+      },
+    ],
     max_tokens: 2048,
-    temperature: 0.7,
+    temperature: 0.5,
     top_p: 1.0,
-    n: 1,
-    frequency_penalty: 1,
-    presence_penalty: 0.5,
+    frequency_penalty: 0.5,
+    presence_penalty: 0.1,
   });
 
-  return response.choices[0].text;
+  return response.choices[0].message.content;
 }
