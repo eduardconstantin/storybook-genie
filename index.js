@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
 import path from "path";
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync, existsSync } from "fs";
 import dotenv from "universal-dotenv";
 import beautify from "js-beautify";
 import { componentConverter } from "./src/converter.js";
 import { fileSelector } from "./src/selector.js";
+import inquirer from "inquirer";
+import getModels from "./src/models.js";
 
 const options = {
   indent_size: 2,
@@ -45,6 +47,28 @@ const showLoading = (message) => {
 };
 
 async function run() {
+  const configPath = path.resolve(process.cwd(), "storybook-genie.config.json");
+  let model;
+
+  if (existsSync(configPath)) {
+    const data = fs.readFileSync(configPath);
+    const config = JSON.parse(data);
+    if (config.defaultModel) {
+      model = config.defaultModel;
+    }
+  }
+
+  if (!model) {
+    const answer = await inquirer.prompt([
+      {
+        type: "list",
+        message: "Select the AI model you want to use",
+        name: "model",
+        choices: await getModels(),
+      },
+    ]);
+    model = answer.model;
+  }
   await fileSelector({
     message: "Select the file containing the react compontent:",
   }).then(async (file) => {
@@ -53,12 +77,10 @@ async function run() {
     const extension = path.extname(file);
     const spinner = showLoading("Generating story...");
     try {
-      const story = await componentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), process.env.OPENAI_API_KEY).then(
-        (story) => {
-          story = beautify(story, resetOptions);
-          return beautify(story, options);
-        }
-      );
+      const story = await componentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), model).then((story) => {
+        story = beautify(story, resetOptions);
+        return beautify(story, options);
+      });
       writeFileSync(file.replace(extension, `.story${extension}`), story);
       spinner.stopLoading("Story generated!", "\x1b[32m");
     } catch (error) {
