@@ -9,8 +9,9 @@ import {
   isNumberKey,
   isUpKey,
   isDownKey,
-  Paginator,
+  usePagination,
   Separator,
+  useEffect,
 } from "@inquirer/core";
 
 const isSelectableChoice = (file) => {
@@ -20,7 +21,6 @@ const isSelectableChoice = (file) => {
 export const fileSelector = createPrompt((config, done) => {
   const { basePath = "./", message, pageSize = 10, extensions = [".js", ".jsx", ".ts", ".tsx"] } = config;
 
-  const paginator = useRef(new Paginator()).current;
   const firstRender = useRef(true);
 
   const [cursorPosition, setCursorPos] = useState(1);
@@ -139,6 +139,12 @@ export const fileSelector = createPrompt((config, done) => {
     firstRender.current = false;
   }
 
-  const windowedChoices = paginator.paginate(allFiles, cursorPosition, pageSize);
+  const windowedChoices = usePagination({
+    items: allFiles,
+    pageSize,
+    active: cursorPosition,
+    renderItem: (layout) => layout.item,
+    loop: false,
+  });
   return `\x1b[92m┇\x1b[0m ${output}\n${windowedChoices}\x1B[?25l`;
 });
