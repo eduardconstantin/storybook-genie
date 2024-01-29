@@ -3,13 +3,12 @@ import path from "path";
 import {
   createPrompt,
   useState,
-  useRef,
   useKeypress,
   isEnterKey,
   isNumberKey,
   isUpKey,
   isDownKey,
-  Paginator,
+  usePagination,
   Separator,
 } from "@inquirer/core";
 
@@ -19,9 +18,6 @@ const isSelectableChoice = (file) => {
 
 export const fileSelector = createPrompt((config, done) => {
   const { basePath = "./", message, pageSize = 10, extensions = [".js", ".jsx", ".ts", ".tsx"] } = config;
-
-  const paginator = useRef(new Paginator()).current;
-  const firstRender = useRef(true);
 
   const [cursorPosition, setCursorPos] = useState(1);
   const [filePath, setFilePath] = useState(basePath);
@@ -111,34 +107,32 @@ export const fileSelector = createPrompt((config, done) => {
     return `\x1b[91m\x1b[1m✘ File selection canceled.\x1b[0m`;
   }
 
-  const allFiles = files
-    .map((choice, index) => {
-      if (choice.type === "separator") {
-        return ` ${choice.separator}`;
-      }
+  const allFiles = files.map((choice, index) => {
+    if (choice.type === "separator") {
+      return ` ${choice.separator}`;
+    }
 
-      const line = choice.name || choice.value;
-      if (choice.disabled) {
-        const disabledLabel = typeof choice.disabled === "string" ? choice.disabled : "(disabled)";
-        return `\x1b[90m- ${line} ${disabledLabel}\x1b[0m`;
-      }
+    const line = choice.name || choice.value;
+    if (choice.disabled) {
+      const disabledLabel = typeof choice.disabled === "string" ? choice.disabled : "(disabled)";
+      return `\x1b[90m- ${line} ${disabledLabel}\x1b[0m`;
+    }
 
-      if (index === cursorPosition) {
-        return line.split(" ").length === 2
-          ? `\x1b[36m❯ ${line.split(" ")[0]}\x1b[0m \x1b[36m${line.split(" ")[1]}\x1b[0m`
-          : `\x1b[36m❯ ${line}\x1b[0m`;
-      }
+    if (index === cursorPosition) {
+      return line.split(" ").length === 2
+        ? `\x1b[36m❯ ${line.split(" ")[0]}\x1b[0m \x1b[36m${line.split(" ")[1]}\x1b[0m`
+        : `\x1b[36m❯ ${line}\x1b[0m`;
+    }
 
-      return `  ${line}`;
-    })
-    .join("\n");
+    return `  ${line}`;
+  });
 
-  let output = `\x1b[1m${message}\x1b[0m`;
-  if (firstRender.current) {
-    output += `\x1b[90m ↕ (Use arrow keys)\x1b[0m`;
-    firstRender.current = false;
-  }
-
-  const windowedChoices = paginator.paginate(allFiles, cursorPosition, pageSize);
-  return `\x1b[92m┇\x1b[0m ${output}\n${windowedChoices}\x1B[?25l`;
+  const windowedChoices = usePagination({
+    items: allFiles,
+    pageSize,
+    active: cursorPosition,
+    renderItem: (layout) => layout.item,
+    loop: false,
+  });
+  return `\x1b[92m┇\x1b[0m ${message}\n${windowedChoices}\x1B[?25l`;
 });
