@@ -48,7 +48,9 @@ const showLoading = (message) => {
 
 async function run() {
   const configPath = path.resolve(process.cwd(), "storybook-genie.config.json");
+  const templatePath = path.resolve(process.cwd(), "storybook-genie.template.js");
   let model;
+  let template;
 
   if (existsSync(configPath)) {
     const data = fs.readFileSync(configPath);
@@ -56,6 +58,11 @@ async function run() {
     if (config.defaultModel) {
       model = config.defaultModel;
     }
+  }
+
+  if (existsSync(templatePath)) {
+    const data = fs.readFileSync(configPath);
+    template = data.trim();
   }
 
   if (!model) {
@@ -77,10 +84,12 @@ async function run() {
     const extension = path.extname(file);
     const spinner = showLoading("Generating story...");
     try {
-      const story = await componentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), model).then((story) => {
-        story = beautify(story, resetOptions);
-        return beautify(story, options);
-      });
+      const story = await componentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), model, template).then(
+        (story) => {
+          story = beautify(story, resetOptions);
+          return beautify(story, options);
+        }
+      );
       writeFileSync(file.replace(extension, `.story${extension}`), story);
       spinner.stopLoading("Story generated!", "\x1b[32m");
     } catch (error) {
