@@ -48,7 +48,6 @@ const showLoading = (message) => {
 
 async function run() {
   const configPath = path.resolve(process.cwd(), "storybook-genie.config.json");
-  const templatePath = path.resolve(process.cwd(), "storybook-genie.template.js");
   let model;
   let template;
 
@@ -60,8 +59,9 @@ async function run() {
     }
   }
 
-  if (existsSync(templatePath)) {
-    const data = fs.readFileSync(configPath);
+  const templateFilePath = glob.sync("storybook-genie.template.*")[0];
+  if (templateFilePath) {
+    const data = readFileSync(templateFilePath, "utf8");
     template = data.trim();
   }
 
