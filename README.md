@@ -1,4 +1,5 @@
 <h1 align="center">Storybook Genie</h1>
+<img src="sgLOGO.png"/>
 <br />
 
 Storybook Genie is a command line interface tool that can be used to convert files that contain React components into
@@ -20,9 +21,10 @@ Storybook stories.
 
 ## 🌟 Features
 
-- Select preferred model
+- Select preferred GPT model
 - File selection input
 - JS beautify
+- Use story template
 - A small number of dependencies
 
 ## 📦 Installation
