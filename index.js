@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import path from "path";
+import { glob } from "glob";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import dotenv from "universal-dotenv";
 import beautify from "js-beautify";
