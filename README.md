@@ -24,7 +24,7 @@ Storybook stories.
 - Select preferred GPT model
 - File selection input
 - JS beautify
-- Use story template
+- Use custom story template
 - A small number of dependencies
 
 ## 📦 Installation
