@@ -63,6 +63,8 @@ following code:
 }
 ```
 
+A default story template can be set in storybook-genie.template.js/ts file, just create on in the root of the project
+
 To use Storybook Genie, run the following command:
 
 ```bash
