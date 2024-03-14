@@ -50,6 +50,7 @@ const showLoading = (message) => {
 async function run() {
   const configPath = path.resolve(process.cwd(), "storybook-genie.config.json");
   let model;
+  let basePath;
   let template;
 
   if (existsSync(configPath)) {
@@ -57,6 +58,7 @@ async function run() {
     const config = JSON.parse(data);
     if (config.defaultModel) {
       model = config.defaultModel;
+      basePath = config.defaultPath;
     }
   }
 
@@ -79,6 +81,7 @@ async function run() {
   }
   await fileSelector({
     message: "Select the file containing the react compontent:",
+    basePath,
   }).then(async (file) => {
     if (!file) return;
     const input = readFileSync(file, "utf-8");
