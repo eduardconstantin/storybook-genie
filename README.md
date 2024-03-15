@@ -25,6 +25,7 @@ Storybook stories.
 - File selection input
 - JS beautify
 - Use custom story template
+- Change default path
 - A small number of dependencies
 
 ## 📦 Installation
@@ -54,12 +55,13 @@ set OPENAI_API_KEY=$YOUR_API_KEY
 
 ## ✨ Usage
 
-A default model can be set in storybook-genie.config.json file, just create on in the root of the project and add the
+A default model and a default path can be set in storybook-genie.config.json file, just create on in the root of the project and add the
 following code:
 
 ```bash
 {
   defaultModel: "gpt-4"
+  defaultPath: "./components
 }
 ```
 
