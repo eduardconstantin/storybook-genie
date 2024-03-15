@@ -11,10 +11,12 @@ Storybook stories.
 <div align="center">
 <br />
 
-[![Project license](https://img.shields.io/github/license/eduardconstantin/storybook-genie?style=flat-square)](LICENSE)
+
 [![Contributors](https://img.shields.io/github/contributors/eduardconstantin/storybook-genie?style=flat-square)](https://github.com/eduardconstantin/storybook-genie/graphs/contributors)
 [![Issue](https://img.shields.io/github/issues/eduardconstantin/storybook-genie?style=flat-square)](https://github.com/eduardconstantin/storybook-genie/issues)
 [![PRs](https://img.shields.io/github/issues-pr/eduardconstantin/storybook-genie?style=flat-square)](https://github.com/eduardconstantin/storybook-genie/pulls)
+<br>
+[![Project license](https://img.shields.io/github/license/eduardconstantin/storybook-genie?style=flat-square)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/eduardconstantin/storybook-genie?style=flat-square)](https://github.com/eduardconstantin/storybook-genie/stargazers)
 
 </div>
