@@ -63,7 +63,7 @@ following code:
 ```bash
 {
   defaultModel: "gpt-4"
-  defaultPath: "./components
+  defaultPath: "./components"
 }
 ```
 
