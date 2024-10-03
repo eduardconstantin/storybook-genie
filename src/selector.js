@@ -22,7 +22,9 @@ export const fileSelector = createPrompt((config, done) => {
   const [cursorPosition, setCursorPos] = useState(1);
   const [filePath, setFilePath] = useState(basePath);
   const [status, setStatus] = useState("pending");
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
+  // Retrieve files and directories
   let files = fs
     .readdirSync(filePath)
     .reduce((acc, file) => {
@@ -50,12 +52,15 @@ export const fileSelector = createPrompt((config, done) => {
       return 0;
     });
 
-  const goBackOption = { name: `\x1b[90m[..]  BACK\x1b[0m`, value: "..", isDirectory: false };
+  // Add navigation options
+  const goBackOption = { name: `\x1b[90m[..]  BACK\x1b[0m`, value: "..", isDirectory: true };
   const exitOption = { name: `\x1b[91mⓧ  EXIT\x1b[0m`, value: null, isDirectory: false };
+  const submitOption = { name: `\x1b[92m✔  SUBMIT SELECTED FILES\x1b[0m`, value: "submit", isDirectory: false };
 
   files.unshift(new Separator());
-  if (filePath !== "./") files.unshift(goBackOption);
+  if (filePath !== "./") files.unshift(goBackOption); // Show the back option if not in root
   files.push(new Separator());
+  files.push(submitOption); // Add Submit option above Exit
   files.push(exitOption);
 
   const choice = files[cursorPosition];
@@ -64,25 +69,38 @@ export const fileSelector = createPrompt((config, done) => {
     if (isEnterKey(key)) {
       const selectedOption = files[cursorPosition];
 
-      if (selectedOption.value === "..") {
-        const parentDirectory = path.dirname(filePath);
-        setFilePath(parentDirectory + "/");
-        setCursorPos(1);
+      if (selectedOption.isDirectory) {
+        // Navigate into directory
+        if (selectedOption.value === "..") {
+          const parentDirectory = path.dirname(filePath);
+          setFilePath(parentDirectory + "/");
+        } else {
+          setFilePath(selectedOption.value); // Go into selected directory
+        }
+        setCursorPos(1); // Reset cursor when entering new directory
       } else if (selectedOption.value === null) {
+        // Exit option
         setStatus("exit");
         done(null);
-      } else if (selectedOption.isDirectory) {
-        setFilePath(selectedOption.value);
-        setCursorPos(2);
+      } else if (selectedOption.value === "submit") {
+        // Handle file submission
+        setStatus("done"); // Change status to done
+        done(selectedFiles); // Call done with selected files
       } else {
-        setStatus("done");
-        done(`./${selectedOption.value}`);
+        // Select or deselect file
+        if (selectedFiles.includes(selectedOption.value)) {
+          setSelectedFiles(selectedFiles.filter(file => file !== selectedOption.value));
+        } else {
+          setSelectedFiles([...selectedFiles, selectedOption.value]);
+        }
       }
     } else if (isUpKey(key) || isDownKey(key)) {
+      // Handle navigation through file list
       let newCursorPosition = cursorPosition;
       const offset = isUpKey(key) ? -1 : 1;
       let selectedOption;
 
+      // Ensure the new option is selectable
       while (!isSelectableChoice(selectedOption)) {
         newCursorPosition = (newCursorPosition + offset + files.length) % files.length;
         selectedOption = files[newCursorPosition];
@@ -90,6 +108,7 @@ export const fileSelector = createPrompt((config, done) => {
 
       setCursorPos(newCursorPosition);
     } else if (isNumberKey(key)) {
+      // Allow quick selection via number keys
       const newCursorPosition = Number(key.name) - 1;
 
       if (!isSelectableChoice(files[newCursorPosition])) {
@@ -101,7 +120,7 @@ export const fileSelector = createPrompt((config, done) => {
   });
 
   if (status === "done") {
-    return `\x1b[92m\x1b[1m✔ Selected file: ${choice.name || choice.value}\x1b[0m`;
+    return `\x1b[92m\x1b[1m✔ Selected files: ${selectedFiles.join(", ")}\x1b[0m`;
   }
   if (status === "exit") {
     return `\x1b[91m\x1b[1m✘ File selection canceled.\x1b[0m`;
@@ -113,18 +132,18 @@ export const fileSelector = createPrompt((config, done) => {
     }
 
     const line = choice.name || choice.value;
+    const isSelected = selectedFiles.includes(choice.value);
+    const selectedMarker = isSelected ? "\x1b[92m✔\x1b[0m " : "  ";
     if (choice.disabled) {
       const disabledLabel = typeof choice.disabled === "string" ? choice.disabled : "(disabled)";
       return `\x1b[90m- ${line} ${disabledLabel}\x1b[0m`;
     }
 
     if (index === cursorPosition) {
-      return line.split(" ").length === 2
-        ? `\x1b[36m❯ ${line.split(" ")[0]}\x1b[0m \x1b[36m${line.split(" ")[1]}\x1b[0m`
-        : `\x1b[36m❯ ${line}\x1b[0m`;
+      return `${selectedMarker}\x1b[36m❯ ${line}\x1b[0m`;
     }
 
-    return `  ${line}`;
+    return ` ${selectedMarker} ${line}`;
   });
 
   const windowedChoices = usePagination({

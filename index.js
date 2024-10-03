@@ -54,7 +54,7 @@ async function run() {
   let template;
 
   if (existsSync(configPath)) {
-    const data = fs.readFileSync(configPath);
+    const data = readFileSync(configPath);
     const config = JSON.parse(data);
     if (config.defaultModel) {
       model = config.defaultModel;
@@ -79,26 +79,30 @@ async function run() {
     ]);
     model = answer.model;
   }
+
   await fileSelector({
-    message: "Select the file containing the react compontent:",
+    message: "Select the files containing the React components:",
     basePath,
-  }).then(async (file) => {
-    if (!file) return;
-    const input = readFileSync(file, "utf-8");
-    const extension = path.extname(file);
-    const spinner = showLoading("Generating story...");
-    try {
-      const story = await componentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), model, template).then(
-        (story) => {
-          story = beautify(story, resetOptions);
-          return beautify(story, options);
-        }
-      );
-      writeFileSync(file.replace(extension, `.story${extension}`), story);
-      spinner.stopLoading("Story generated!", "\x1b[32m");
-    } catch (error) {
-      spinner.stopLoading("Error generating story: " + error.message, "\x1b[91m");
-    }
+  }).then(async (selectedFiles) => { // Adjusted to expect an array of selected files
+    if (!selectedFiles || selectedFiles.length === 0) return; // Check if any files are selected
+
+    selectedFiles.forEach(async (file) => { // Loop through selected files
+      const input = readFileSync(file, "utf-8");
+      const extension = path.extname(file);
+      const spinner = showLoading("Generating story...");
+      try {
+        const story = await componentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), model, template).then(
+          (story) => {
+            story = beautify(story, resetOptions);
+            return beautify(story, options);
+          }
+        );
+        writeFileSync(file.replace(extension, `.story${extension}`), story);
+        spinner.stopLoading(`Story generated for ${file}!`, "\x1b[32m");
+      } catch (error) {
+        spinner.stopLoading(`Error generating story for ${file}: ` + error.message, "\x1b[91m");
+      }
+    });
   });
 }
 
