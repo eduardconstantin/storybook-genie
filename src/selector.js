@@ -19,7 +19,7 @@ const isSelectableChoice = (file) => {
 export const fileSelector = createPrompt((config, done) => {
   const { basePath = "./", message, pageSize = 10, extensions = [".js", ".jsx", ".ts", ".tsx"] } = config;
 
-  const [cursorPosition, setCursorPos] = useState(0);
+  const [cursorPosition, setCursorPos] = useState(1);
   const [filePath, setFilePath] = useState(basePath);
   const [status, setStatus] = useState("pending");
   const [selectedFiles, setSelectedFiles] = useState([]);
