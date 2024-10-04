@@ -42,7 +42,7 @@ export const fileSelector = createPrompt((config, done) => {
       const isDirectory = fs.lstatSync(fullPath).isDirectory();
 
       if (isDirectory || extensions.includes(path.extname(file))) {
-        const displayText = isDirectory ? `\x1b[94m\x1b[1m[DIR]${file}\x1b[0m ` : file;
+        const displayText = isDirectory ? `\x1b[94m\x1b[1m[DIR]\x1b[0m ${file}` : file;
         acc.push({
           name: displayText,
           value: isDirectory ? `${fullPath}/` : fullPath,
