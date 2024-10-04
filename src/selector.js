@@ -150,7 +150,9 @@ export const fileSelector = createPrompt((config, done) => {
     }
 
     if (index === cursorPosition) {
-      return `${selectedMarker}\x1b[36m❯ ${line}\x1b[0m`;
+      return line.split(" ").length === 2
+        ? `${selectedMarker}\x1b[36m❯ ${line.split(" ")[0]}\x1b[0m \x1b[36m${line.split(" ")[1]}\x1b[0m`
+        : `${selectedMarker}\x1b[36m❯ ${line}\x1b[0m`;
     }
 
     return ` ${selectedMarker} ${line}`;
