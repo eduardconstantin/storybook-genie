@@ -23,17 +23,7 @@ export const fileSelector = createPrompt((config, done) => {
   const [filePath, setFilePath] = useState(basePath);
   const [status, setStatus] = useState("pending");
   const [selectedFiles, setSelectedFiles] = useState([]);
-
-  // Function to reset cursor to the first selectable item
-  const resetCursorToFirstSelectable = (files) => {
-    for (let i = 0; i < files.length; i++) {
-      if (isSelectableChoice(files[i])) {
-        setCursorPos(i); // Set cursor to the first selectable item
-        break;
-      }
-    }
-  };
-
+  
   // Retrieve files and directories
   let files = fs
     .readdirSync(filePath)
