@@ -19,10 +19,20 @@ const isSelectableChoice = (file) => {
 export const fileSelector = createPrompt((config, done) => {
   const { basePath = "./", message, pageSize = 10, extensions = [".js", ".jsx", ".ts", ".tsx"] } = config;
 
-  const [cursorPosition, setCursorPos] = useState(1);
+  const [cursorPosition, setCursorPos] = useState(0);
   const [filePath, setFilePath] = useState(basePath);
   const [status, setStatus] = useState("pending");
   const [selectedFiles, setSelectedFiles] = useState([]);
+
+  // Function to reset cursor to the first selectable item
+  const resetCursorToFirstSelectable = (files) => {
+    for (let i = 0; i < files.length; i++) {
+      if (isSelectableChoice(files[i])) {
+        setCursorPos(i); // Set cursor to the first selectable item
+        break;
+      }
+    }
+  };
 
   // Retrieve files and directories
   let files = fs
@@ -32,7 +42,7 @@ export const fileSelector = createPrompt((config, done) => {
       const isDirectory = fs.lstatSync(fullPath).isDirectory();
 
       if (isDirectory || extensions.includes(path.extname(file))) {
-        const displayText = isDirectory ? `\x1b[94m\x1b[1m[DIR]\x1b[0m ${file}` : file;
+        const displayText = isDirectory ? `\x1b[94m\x1b[1m[DIR]${file}\x1b[0m ` : file;
         acc.push({
           name: displayText,
           value: isDirectory ? `${fullPath}/` : fullPath,
@@ -77,7 +87,7 @@ export const fileSelector = createPrompt((config, done) => {
         } else {
           setFilePath(selectedOption.value); // Go into selected directory
         }
-        setCursorPos(1); // Reset cursor when entering new directory
+        setCursorPos(0); // Reset cursor when entering new directory
       } else if (selectedOption.value === null) {
         // Exit option
         setStatus("exit");
