@@ -19,7 +19,7 @@ const isSelectableChoice = (file) => {
 export const fileSelector = createPrompt((config, done) => {
   const { basePath = "./", message, pageSize = 10, extensions = [".js", ".jsx", ".ts", ".tsx"] } = config;
 
-  const [cursorPosition, setCursorPos] = useState(0);
+  const [cursorPosition, setCursorPos] = useState(1);
   const [filePath, setFilePath] = useState(basePath);
   const [status, setStatus] = useState("pending");
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -32,7 +32,7 @@ export const fileSelector = createPrompt((config, done) => {
       const isDirectory = fs.lstatSync(fullPath).isDirectory();
 
       if (isDirectory || extensions.includes(path.extname(file))) {
-        const displayText = isDirectory ? `\x1b[94m\x1b[1m[DIR]${file}\x1b[0m ` : file;
+        const displayText = isDirectory ? `\x1b[94m\x1b[1m[DIR]\x1b[0m ${file}` : file;
         acc.push({
           name: displayText,
           value: isDirectory ? `${fullPath}/` : fullPath,
@@ -53,7 +53,7 @@ export const fileSelector = createPrompt((config, done) => {
     });
 
   // Add navigation options
-  const goBackOption = { name: `\x1b[90m[..]  BACK\x1b[0m`, value: "..", isDirectory: true };
+  const goBackOption = { name: `\x1b[90m[..]  BACK\x1b[0m`, value: "..", isDirectory: false};
   const exitOption = { name: `\x1b[91mⓧ  EXIT\x1b[0m`, value: null, isDirectory: false };
   const submitOption = { name: `\x1b[92m✔  SUBMIT SELECTED FILES\x1b[0m`, value: "submit", isDirectory: false };
 
@@ -140,7 +140,9 @@ export const fileSelector = createPrompt((config, done) => {
     }
 
     if (index === cursorPosition) {
-      return `${selectedMarker}\x1b[36m❯ ${line}\x1b[0m`;
+      return line.split(" ").length === 2
+        ? `${selectedMarker}\x1b[36m❯ ${line.split(" ")[0]}\x1b[0m \x1b[36m${line.split(" ")[1]}\x1b[0m`
+        : `${selectedMarker}\x1b[36m❯ ${line}\x1b[0m`;
     }
 
     return ` ${selectedMarker} ${line}`;

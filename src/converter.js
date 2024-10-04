@@ -1,6 +1,6 @@
 import getClient from "./client.js";
 
-export async function componentConverter(components, model, template) {
+export async function componentConverter(component, model, template) {
   const defaultTemplate =
     template ||
     `import type { Meta, StoryObj } from '@storybook/react';\n/* import component file */\nconst meta = {\n  title: /* Component title */,\n  component: /* Component name */,\n  parameters: {\n    layout: 'centered'\n  },\n  tags: ['autodocs'],\n} satisfies Meta<typeof /* Component name */>\n\nexport default meta\n\ntype Story = StoryObj<typeof meta>\n\nexport const /* StoryName */ : Story = {\n  args: {\n    /* args */\n  },\n}`;
