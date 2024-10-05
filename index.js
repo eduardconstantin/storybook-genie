@@ -9,8 +9,9 @@ import { componentConverter } from "./src/converter.js";
 import { fileSelector } from "./src/selector.js";
 import inquirer from "inquirer";
 import getModels from "./src/models.js";
-
-const options = {
+import getClient from './src/client.js';
+const options = 
+{
   indent_size: 2,
   jslint_happy: true,
   end_with_newline: false,
@@ -52,9 +53,10 @@ async function run() {
   let model;
   let basePath;
   let template;
+  let apiType;
 
   if (existsSync(configPath)) {
-    const data = fs.readFileSync(configPath);
+    const data = readFileSync(configPath);
     const config = JSON.parse(data);
     if (config.defaultModel) {
       model = config.defaultModel;
@@ -68,19 +70,35 @@ async function run() {
     template = data.trim();
   }
 
+  
+  const apiAnswer = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'apiChoice',
+      message: 'Which API would you like to use?',
+      choices: ['OpenAI', 'Ollama'],
+    },
+  ]);
+
+  apiType = apiAnswer.apiChoice.toLowerCase(); 
+
+  
+  const models = await getModels(apiType);
+  
   if (!model) {
     const answer = await inquirer.prompt([
       {
         type: "list",
         message: "Select the AI model you want to use",
         name: "model",
-        choices: await getModels(),
+        choices: models,
       },
     ]);
     model = answer.model;
   }
+
   await fileSelector({
-    message: "Select the file containing the react compontent:",
+    message: "Select the file containing the react component:",
     basePath,
   }).then(async (file) => {
     if (!file) return;
@@ -88,12 +106,9 @@ async function run() {
     const extension = path.extname(file);
     const spinner = showLoading("Generating story...");
     try {
-      const story = await componentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), model, template).then(
-        (story) => {
-          story = beautify(story, resetOptions);
-          return beautify(story, options);
-        }
-      );
+      let story = await componentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), model, template, apiType);
+      story = beautify(story, resetOptions);
+      story = beautify(story, options);
       writeFileSync(file.replace(extension, `.story${extension}`), story);
       spinner.stopLoading("Story generated!", "\x1b[32m");
     } catch (error) {
