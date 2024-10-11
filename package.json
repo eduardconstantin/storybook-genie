@@ -34,12 +34,9 @@
   },
   "dependencies": {
     "@inquirer/core": "7.0.0",
-    "blessed": "^0.1.81",
-    "dotenv": "^16.4.5",
     "inquirer": "^9.2.12",
     "js-beautify": "^1.14.11",
     "openai": "^4.25.0",
-    "storybook-genie": "^1.2.1",
     "universal-dotenv": "^4.1.0"
   }
 }
