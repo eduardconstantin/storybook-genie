@@ -54,7 +54,7 @@ export const fileSelector = createPrompt((config, done) => {
 
 
   const goBackOption = { name: `\x1b[90m[..]  BACK\x1b[0m`, value: "..", isDirectory: false };
-  const exitOption = { name: `\x1b[91m ❌  EXIT\x1b[0m`, value: null, isDirectory: false };
+  const exitOption = { name: `\x1b[91m✖  EXIT\x1b[0m`, value: null, isDirectory: false };
   const submitOption = { name: `\x1b[92m✔  SUBMIT SELECTED FILES\x1b[0m`, value: "submit", isDirectory: false };
 
 
