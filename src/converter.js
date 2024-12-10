@@ -1,4 +1,4 @@
-import getClient from "./client.js";
+import getOpenAIClient from "./client.js";
 
 export async function componentConverter(component, model, template) {
   const defaultTemplate =
@@ -8,7 +8,7 @@ export async function componentConverter(component, model, template) {
 
   const convertedComponents = [];
   for (const component of components) {
-    const response = await getClient().chat.completions.create({
+    const response = await getOpenAIClient().chat.completions.create({
       model,
       messages: [
         {

@@ -1,9 +1,15 @@
 import OpenAI from "openai";
-const getClient = () => {
+import ollama from "ollama";
+
+const getOpenAIClient = () => {
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
   return openai;
 };
 
-export default getClient;
+const getOllamaClient = () => {
+  return ollama;
+};
+
+export { getOpenAIClient, getOllamaClient };
