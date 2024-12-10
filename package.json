@@ -36,6 +36,7 @@
     "@inquirer/core": "7.0.0",
     "inquirer": "^9.2.12",
     "js-beautify": "^1.14.11",
+    "ollama": "^0.5.11",
     "openai": "^4.25.0",
     "universal-dotenv": "^4.1.0"
   }
