@@ -1,4 +1,4 @@
-import getOpenAIClient from "./client.js";
+import { getOpenAIClient } from "./client.js";
 
 export async function componentConverter(component, model, template) {
   const defaultTemplate =
@@ -29,8 +29,6 @@ export async function componentConverter(component, model, template) {
 
     convertedComponents.push(response.choices[0].message.content);
   }
-
- 
 
   return convertedComponents;
 }

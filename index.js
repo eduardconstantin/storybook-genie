@@ -52,6 +52,7 @@ async function run() {
   let model;
   let basePath;
   let template;
+  let apiType;
 
   if (existsSync(configPath)) {
     const data = readFileSync(configPath);
@@ -68,13 +69,26 @@ async function run() {
     template = data.trim();
   }
 
+  const apiAnswer = await inquirer.prompt([
+    {
+      type: "list",
+      name: "apiChoice",
+      message: "Which API would you like to use?",
+      choices: ["OpenAI", "Ollama"],
+    },
+  ]);
+
+  apiType = apiAnswer.apiChoice.toLowerCase();
+
+  const models = await getModels(apiType);
+
   if (!model) {
     const answer = await inquirer.prompt([
       {
         type: "list",
         message: "Select the AI model you want to use",
         name: "model",
-        choices: await getModels(),
+        choices: models,
       },
     ]);
     model = answer.model;
@@ -83,10 +97,12 @@ async function run() {
   await fileSelector({
     message: "Select the files containing the React components:",
     basePath,
-  }).then(async (selectedFiles) => { // Adjusted to expect an array of selected files
+  }).then(async (selectedFiles) => {
+    // Adjusted to expect an array of selected files
     if (!selectedFiles || selectedFiles.length === 0) return; // Check if any files are selected
 
-    selectedFiles.forEach(async (file) => { // Loop through selected files
+    selectedFiles.forEach(async (file) => {
+      // Loop through selected files
       const input = readFileSync(file, "utf-8");
       const extension = path.extname(file);
       const spinner = showLoading("Generating story...");
