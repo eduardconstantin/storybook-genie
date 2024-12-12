@@ -107,7 +107,7 @@ async function run() {
       const extension = path.extname(file);
       const spinner = showLoading("Generating story...");
       try {
-        const story = await componentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), model, template).then(
+        const story = await componentConverter(input.replace(/^\s*[\r\n]/gm, "").trim(), model, template, apiType).then(
           (story) => {
             story = beautify(story, resetOptions);
             return beautify(story, options);
