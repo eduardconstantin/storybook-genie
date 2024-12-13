@@ -25,7 +25,7 @@
   },
   "scripts": {
     "start": "node .",
-    "up": "npm version patch -f",
+    "up": "npm version minor -f",
     "pub": "npm run up && npm publish"
   },
   "repository": {
