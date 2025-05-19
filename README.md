@@ -23,7 +23,8 @@ Storybook stories.
 
 ## 🌟 Features
 
-- Select preferred GPT model
+- Select preferred GPT model (OpenAI or Ollama)
+- Use local Ollama models (no API key required)
 - File selection input
 - JS beautify
 - Use custom story template
@@ -40,8 +41,11 @@ npm install storybook-genie
 
 ## 🛠️ Configuration
 
-In order to use this package, you need to set your OpenAI API key as an environment variable. You can do this by adding
-the following line to your .env file, or by setting it directly in your terminal:
+You can use either OpenAI or Ollama as your AI backend.
+
+### Using OpenAI
+
+Set your OpenAI API key as an environment variable. You can do this by adding the following line to your .env file, or by setting it directly in your terminal:
 
 For Unix-based systems:
 
@@ -55,25 +59,42 @@ For Windows systems:
 set OPENAI_API_KEY=$YOUR_API_KEY
 ```
 
-## ✨ Usage
+### Using Ollama
 
-A default model and a default path can be set in storybook-genie.config.json file, just create on in the root of the project and add the
-following code:
+No API key is required, but you must have the [Ollama server](https://ollama.com/) running locally and at least one model pulled (e.g., `llama3`, `mistral`, etc.).
+
+Start Ollama:
 
 ```bash
+ollama serve
+```
+
+Pull a model (example):
+
+```bash
+ollama pull llama3
+```
+
+## ✨ Usage
+
+A default model and a default path can be set in storybook-genie.config.json file, just create one in the root of the project and add the following code:
+
+```json
 {
-  defaultModel: "gpt-4"
-  defaultPath: "./components"
+  "defaultModel": "gpt-4",
+  "defaultPath": "./components"
 }
 ```
 
-A default story template can be set in storybook-genie.template.js/ts file, just create on in the root of the project
+A default story template can be set in storybook-genie.template.js/ts file, just create one in the root of the project.
 
 To use Storybook Genie, run the following command:
 
 ```bash
 npx storybook-genie
 ```
+
+You will be prompted to select which API to use (OpenAI or Ollama), then select the model, and then select the files.
 
 ## 🌱 Getting Started
 
