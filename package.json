@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@inquirer/core": "7.0.0",
-    "inquirer": "^9.2.12",
+    "inquirer": "^12.9.4",
     "js-beautify": "^1.14.11",
     "ollama": "^0.5.11",
     "openai": "^4.25.0",
