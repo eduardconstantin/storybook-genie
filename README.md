@@ -77,10 +77,11 @@ ollama pull llama3
 
 ## ✨ Usage
 
-A default model and a default path can be set in storybook-genie.config.json file, just create one in the root of the project and add the following code:
+A defualt AI-backend provider, a default model and a default path can be set in storybook-genie.config.json file, just create one in the root of the project and add the following code:
 
 ```json
 {
+  "defaultProvider": "OpenAI",
   "defaultModel": "gpt-4",
   "defaultPath": "./components"
 }
