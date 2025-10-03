@@ -49,14 +49,17 @@ const showLoading = (message) => {
 
 async function run() {
   const configPath = path.resolve(process.cwd(), "storybook-genie.config.json");
+  let apiType;
   let model;
   let basePath;
   let template;
-  let apiType;
 
   if (existsSync(configPath)) {
     const data = readFileSync(configPath);
     const config = JSON.parse(data);
+    if (config.defaultProvider) {
+      apiType = config.defaultProvider;
+    }
     if (config.defaultModel) {
       model = config.defaultModel;
       basePath = config.defaultPath;
@@ -69,16 +72,17 @@ async function run() {
     template = data.trim();
   }
 
-  const apiAnswer = await inquirer.prompt([
-    {
-      type: "list",
-      name: "apiChoice",
-      message: "Which API would you like to use?",
-      choices: ["OpenAI", "Ollama"],
-    },
-  ]);
-
-  apiType = apiAnswer.apiChoice.toLowerCase();
+  if (!apiType) {
+    const apiAnswer = await inquirer.prompt([
+      {
+        type: "list",
+        name: "apiChoice",
+        message: "Which API would you like to use?",
+        choices: ["OpenAI", "Ollama"],
+      },
+    ]);
+    apiType = apiAnswer.apiChoice.toLowerCase();
+  }
 
   const models = await getModels(apiType);
 
