@@ -18,6 +18,7 @@ Storybook stories.
 <br>
 [![Project license](https://img.shields.io/github/license/eduardconstantin/storybook-genie?style=flat-square)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/eduardconstantin/storybook-genie?style=flat-square)](https://github.com/eduardconstantin/storybook-genie/stargazers)
+[![NPM](https://img.shields.io/npm/v/storybook-genie?style=flat-square)](https://www.npmjs.com/package/storybook-genie)
 
 </div>
 
